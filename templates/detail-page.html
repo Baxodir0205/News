@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+        <!-- Modal Search Start -->
+        <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex align-items-center">
+                        <div class="input-group w-75 mx-auto d-flex">
+                            <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Search End -->
+
+        <!-- Single Product Start -->
+        <div class="container-fluid py-5">
+            <div class="container py-5">
+                <ol class="breadcrumb justify-content-start mb-4">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Bosh sahifa</a></li>
+                    <li class="breadcrumb-item"><a href="#">{{ article.category.name }}</a></li>
+                    <li class="breadcrumb-item active text-dark">{{ article.title|truncatechars:60 }}</li>
+                </ol>
+                <div class="row g-4">
+                    <div class="col-lg-12">
+                        <div class="mb-4">
+                            <a href="#" class="h1 display-5">{{ article.title }}</a>
+                        </div>
+                        <div class="position-relative rounded overflow-hidden mb-3">
+                            <img src="{{ article.cover.url }}" class="img-zoomin img-fluid rounded w-100" alt="">
+                            <div class="position-absolute text-white px-4 py-2 bg-primary rounded" style="top: 20px; right: 20px;">
+                                {{ article.category.name }}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="#" class="text-dark link-hover me-3"><i class="fa fa-clock"></i> {{ article.read_time }} O'qiladi</a>
+                            <a href="#" class="text-dark link-hover me-3"><i class="fa fa-eye"></i> {{ article.views }} ko'rishlar</a>
+                            <a href="#" class="text-dark link-hover me-3"><i class="fa fa-comment-dots"></i> {{ article.comment_set.count }} izoh</a>
+                            <a href="#" class="text-dark link-hover"><i class="fa fa-calendar-day"></i> {{ article.created_at|date:"d.m.Y" }}</a>
+                        </div>
+
+                        {% for context in article.context_set.all %}
+                            {% if context.text %}
+                                <p class="my-4">{{ context.text }}</p>
+                            {% endif %}
+                            {% if context.image %}
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <div class="rounded overflow-hidden">
+                                            <img src="{{ context.image.url }}" class="img-zoomin img-fluid rounded w-100" alt="">
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <div class="tab-class mt-4">
+                            <div class="d-flex justify-content-between border-bottom mb-4">
+                                <ul class="nav nav-pills d-inline-flex text-center">
+                                    <li class="nav-item mb-3">
+                                        <h5 class="mt-2 me-3 mb-0">Taglar:</h5>
+                                    </li>
+                                    {% for tag in article.tags.all %}
+                                    <li class="nav-item mb-3">
+                                        <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
+                                            <span class="text-dark px-3">#{{ tag.name }}</span>
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0 me-3">Share:</h5>
+                                    <i class="fab fa-facebook-f link-hover btn btn-square rounded-circle border-primary text-dark me-2"></i>
+                                    <i class="btn fab bi-twitter link-hover btn btn-square rounded-circle border-primary text-dark me-2"></i>
+                                    <i class="btn fab fa-instagram link-hover btn btn-square rounded-circle border-primary text-dark me-2"></i>
+                                    <i class="btn fab fa-linkedin-in link-hover btn btn-square rounded-circle border-primary text-dark"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- O'xshash yangiliklar Start -->
+                        <div class="bg-light rounded my-4 p-4">
+                            <h4 class="mb-4">O'xshash yangiliklar</h4>
+                            <div class="row g-4">
+                                {% for related in related_articles %}
+                                <div class="col-12">
+                                    <div class="d-flex align-items-center p-3 bg-white rounded shadow-sm">
+                                        <div class="flex-shrink-0" style="width: 250px;">
+                                            {% if related.cover %}
+                                                <img src="{{ related.cover.url }}" class="img-fluid rounded w-100" style="height: 160px; object-fit: cover;" alt="">
+                                            {% else %}
+                                                <img src="{% static 'img/news-1.jpg' %}" class="img-fluid rounded w-100" style="height: 160px; object-fit: cover;" alt="">
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1 ms-4">
+                                            <a href="{% url 'article-details' related.slug %}" class="h5 d-block mb-3 text-dark text-decoration-none link-hover">
+                                                {{ related.title }}
+                                            </a>
+                                            <p class="text-muted mb-0">
+                                                <i class="fa fa-clock me-1"></i> {{ related.read_time }} o'qiladi
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted ps-3">Hozircha o'xshash maqolalar yo'q.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <!-- O'xshash yangiliklar End -->
+
+                        <!-- Comments Start -->
+                        <div class="bg-light rounded p-4">
+                            <h4 class="mb-4">Comments</h4>
+                            {% for comment in article.comment_set.all %}
+                            <div class="p-4 bg-white rounded mb-4 shadow-sm">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between">
+                                            <h5>{% if comment.name %}{{ comment.name }}{% else %}Anonim{% endif %}</h5>
+                                        </div>
+                                        <small class="text-body d-block mb-3"><i class="fas fa-calendar-alt me-1"></i> {{ comment.created_at|date:"M d, Y" }}</small>
+                                        <p class="mb-0">{{ comment.content }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted">Hozircha izohlar yo'q.</p>
+                            {% endfor %}
+                        </div>
+                        <!-- Comments End -->
+
+                        <!-- Leave A Comment Start -->
+                        <div class="bg-light rounded p-4 my-4">
+                            <h4 class="mb-4">Izohingizni qoldiring</h4>
+                            <form action="/comment/create/" method="post">
+                                {% csrf_token %}
+                                <div class="row g-4">
+                                    <div class="col-lg-6">
+                                        <input type="content" name="name" class="form-control py-3" placeholder="Ism...">
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <input type="email" name="email" class="form-control py-3" placeholder="email...">
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea class="form-control" name="content" cols="30" rows="5" placeholder="Fikrlaringizni kiriting..."></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button class="form-control btn btn-primary py-3" type="submit">Yuborish</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Leave A Comment End -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Single Product End -->
+
+{% endblock %}
